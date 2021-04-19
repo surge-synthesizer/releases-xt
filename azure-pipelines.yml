@@ -140,10 +140,8 @@ jobs:
       sudo xcode-select -s /Applications/Xcode_12.2.app
 
       cd surge
-      cmake -Bbuild -GXcode -D AZURE_PIPELINE=1  -D"CMAKE_OSX_ARCHITECTURES=arm64;x86_64"
-
-      cmake --build build --config Release --target surge-xt-distribution | xcpretty
-
+      cmake -Bbuild -D AZURE_PIPELINE=1  -D"CMAKE_OSX_ARCHITECTURES=arm64;x86_64"
+      cmake --build build --config Release --target surge-xt-distribution --parallel 
     displayName: macOS - Build Surge
     condition: variables.isMac
 
@@ -204,7 +202,7 @@ jobs:
 
   - task: PublishPipelineArtifact@0
     inputs:
-      artifactName: 'INSTALLER_WIN_X86_EXE'
+      artifactName: 'INSTALLER_WIN_X86_ZIP'
       targetPath: 'surge/build/surge-xt-zip'
     condition: and(variables.isWindows, variables.x86)
     displayName: win32 - publish installer
