@@ -1,0 +1,259 @@
+# Surge synth build script
+# https://aka.ms/yaml
+
+trigger: none
+
+variables:
+  DECODE_PERCENTS: false
+
+jobs:
+
+- job: Build
+  condition: succeeded()
+  strategy:
+    matrix:
+      mac:
+        imageName: 'macos-10.15'
+        isMac: true
+      windows:
+        imageName: 'vs2017-win2016'
+        isWindows: true
+        x64: true
+      windows-x86:
+        imageName: 'vs2017-win2016'
+        isWindows: true
+        x86: true
+      linux:
+        imageName: 'ubuntu-18.04'
+        isLinux: true
+        
+  pool:
+    vmImage: $(imageName)
+
+  steps:
+  - checkout: none
+
+### SETUP SECTION
+
+  - bash: |
+      set -e
+
+      if [ "$SURGE_BRANCH" == "" ]; then
+        export SURGE_LOCAL_BRANCH='xt-alpha'
+      else
+        export SURGE_LOCAL_BRANCH="${SURGE_BRANCH/refs\/heads\/}"
+      fi
+
+      if ! [[ $SURGE_LOCAL_BRANCH =~ ^(main|xt-alpha|release/.+)$ ]]; then
+        exit 1
+      fi
+
+      echo "SURGE_LOCAL_BRANCH=$SURGE_LOCAL_BRANCH"
+      echo "##vso[task.setvariable variable=SURGE_LOCAL_BRANCH]$SURGE_LOCAL_BRANCH"
+      echo "##vso[task.setvariable variable=SURGE_LOCAL_BRANCH;isOutput=true]$SURGE_LOCAL_BRANCH"
+
+      export SURGE_VERSION="${SURGE_LOCAL_BRANCH##*/}"
+      echo "SURGE_VERSION=$SURGE_VERSION"
+
+      # get the surge code
+      git clone --depth 5 --branch $SURGE_LOCAL_BRANCH https://github.com/surge-synthesizer/surge.git 
+      cd surge
+      
+      set +e
+      . ./scripts/misc/defensive-submodule.sh
+      set -e
+
+      if [ "$SURGE_VERSION" == "main" ]; then
+        export SURGE_VERSION="NIGHTLY-$(date +%Y-%m-%d)-$(git rev-parse --short HEAD)"
+      fi
+      if [ "$SURGE_VERSION" == "xt-alpha" ]; then
+        export SURGE_VERSION="XT-NIGHTLY-$(date +%Y-%m-%d)-$(git rev-parse --short HEAD)"
+      fi
+      echo "SURGE_VERSION=$SURGE_VERSION"
+
+      # set the active version
+      echo $SURGE_VERSION > VERSION
+
+      export SURGE_VERSION=$(cat VERSION)
+      echo "SURGE_VERSION=$SURGE_VERSION"
+      echo "##vso[task.setvariable variable=SURGE_VERSION]$SURGE_VERSION"
+      echo "##vso[task.setvariable variable=SURGE_VERSION;isOutput=true]$SURGE_VERSION"
+    name: surge
+    displayName: all - Setup Source and Version
+
+  - bash: |
+      set -x
+      sudo apt-get update
+
+      # Requirements for Surge
+      
+      sudo apt-get install -y libgtkmm-3.0-dev
+      sudo apt-get install -y xcb
+      sudo apt-get install -y libxcb-util-dev
+      sudo apt-get install -y libxcb-cursor-dev
+      sudo apt-get install -y libxcb-keysyms1-dev
+      sudo apt-get install -y libxkbcommon-dev
+      sudo apt-get install -y libxkbcommon-x11-dev
+      sudo apt-get install -y devscripts
+
+      # Requirements for surge-fx
+      sudo apt-get install -y libgtk-3-dev
+      sudo apt-get install -y libwebkit2gtk-4.0
+      sudo apt-get install -y libwebkit2gtk-4.0-dev
+      sudo apt-get install -y libcurl4-openssl-dev
+      sudo apt-get install -y alsa
+      sudp apt-get install -y alsa-tools
+      sudo apt-get install -y libasound2-dev
+      sudo apt-get install -y jack
+      sudo apt-get install -y libjack-dev
+      sudo apt-get install -y libfreetype6-dev
+      sudo apt-get install -y libxinerama-dev
+      sudo apt-get install -y libxcb-xinerama0
+      sudo apt-get install -y libxinerama1
+      sudo apt-get install -y x11proto-xinerama-dev
+      sudo apt-get install -y libxrandr-dev
+      sudo apt-get install -y libgl1-mesa-dev
+      sudo apt-get install -y libxcursor-dev 
+      sudo apt-get install -y libxcursor1 
+      sudo apt-get install -y libxcb-cursor-dev 
+      sudo apt-get install -y libxcb-cursor0
+
+    condition: variables.isLinux
+    displayName: linux - Setup Host
+
+#### DO THE SURGE BUILDS
+
+  - bash: |
+      set -e
+      cmake -Bbuild -D AZURE_PIPELINE=1 -DCMAKE_INSTALL_PREFIX=/usr
+
+      cmake --build build --config Release --target surge-xt-distribution --parallel 2
+
+    condition: variables.isLinux
+    displayName: linux - Build Surge
+
+
+  - bash: |
+      set -e
+      sudo xcode-select -s /Applications/Xcode_12.2.app
+
+      cmake -Bbuild -GXcode -D AZURE_PIPELINE=1  -D"CMAKE_OSX_ARCHITECTURES=arm64;x86_64"
+
+      cmake --build build --config Release --target surge-xt-distribution | xcpretty
+
+    displayName: macOS - Build Surge
+    condition: variables.isMac
+
+
+  - bash: |
+      set -e
+
+      mkdir -p build
+      cmake -Bbuild -A x64 -D AZURE_PIPELINE=1
+    condition: and(variables.isWindows, variables.x64)
+    displayName: win64 - Setup Project
+
+  - bash: |
+      set -e
+
+      mkdir -p build
+      cmake -Bbuild -A Win32 -D AZURE_PIPELINE=1 
+    condition: and(variables.isWindows, variables.x86)
+    displayName: win32 - Setup Project
+
+
+  - bash: |
+      set -e
+
+      cmake --build build --config Release --target surge-xt-distribution
+    condition: variables.isWindows
+    displayName: win - Build Surge
+
+  - bash: |
+      ls -l build/surge_products/
+    displayName: all - Whats in Surge Products then?
+
+
+  - task: PublishPipelineArtifact@0
+    inputs:
+      artifactName: 'INSTALLER_MAC_ZIP'
+      targetPath: 'build/surge-xt-zip'
+    condition: variables.isMac
+    displayName: mac - publish windows zip
+
+  - task: PublishPipelineArtifact@0
+    inputs:
+      artifactName: 'INSTALLER_LIN_ZIP'
+      targetPath: 'build/surge-xt-zip'
+    condition: variables.isLinux
+    displayName: mac - publish windows zip
+
+  - task: PublishPipelineArtifact@0
+    inputs:
+      artifactName: 'INSTALLER_WIN_ZIP'
+      targetPath: 'build/surge-xt-zip'
+    condition: and(variables.isWindows, variables.x64)
+    displayName: win64 - publish windows zip
+
+  - task: PublishPipelineArtifact@0
+    inputs:
+      artifactName: 'INSTALLER_WIN_X86_EXE'
+      targetPath: 'build/surge-xt-zip'
+    condition: and(variables.isWindows, variables.x86)
+    displayName: win32 - publish installer
+
+
+- job: Release
+  dependsOn: Build
+  condition: succeeded()
+  strategy:
+    matrix:
+      release-on-mac:
+        imageName: 'macos-10.15'
+
+  variables:
+    SURGE_VERSION: $[ dependencies.Build.outputs['mac.surge.SURGE_VERSION'] ]
+    SURGE_BRANCH: $[ dependencies.Build.outputs['mac.surge.SURGE_LOCAL_BRANCH'] ]
+
+  steps:
+  - checkout: self
+
+  - task: DownloadSecureFile@1
+    inputs:
+      secureFile: discord-nightly.webhook
+
+  - task: DownloadPipelineArtifact@0
+    inputs:
+      artifactName: 'INSTALLER_MAC_ZIP'
+      targetPath: $(System.DefaultWorkingDirectory)
+
+  - task: DownloadPipelineArtifact@0
+    inputs:
+      artifactName: 'INSTALLER_WIN_ZIP'
+      targetPath: $(System.DefaultWorkingDirectory)
+
+  - task: DownloadPipelineArtifact@0
+    inputs:
+      artifactName: 'INSTALLER_WIN_X86_ZIP'
+      targetPath: $(System.DefaultWorkingDirectory)
+
+  - task: DownloadPipelineArtifact@0
+    inputs:
+      artifactName: 'INSTALLER_LIN_ZIP'
+      targetPath: $(System.DefaultWorkingDirectory)
+
+  - bash: |
+      set -e
+      set -x
+
+      echo "SURGE_VERSION: $SURGE_VERSION"
+
+      ls -alFh
+
+      mkdir -p releases
+      mv *.zip releases
+
+
+      # Finally tell discord
+      curl -i -H "Accept: application/json" -H "Content-Type:application/json" -X POST --data "{\"content\": \"A SurgeXT Build is finished: \n*${SURGE_VERSION}*\n\"}" `cat $AGENT_TEMPDIRECTORY/discord-nightly.webhook`
+    displayName: Perform Release
