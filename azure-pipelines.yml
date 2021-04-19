@@ -125,6 +125,8 @@ jobs:
 
   - bash: |
       set -e
+      cd surge
+      
       cmake -Bbuild -D AZURE_PIPELINE=1 -DCMAKE_INSTALL_PREFIX=/usr
 
       cmake --build build --config Release --target surge-xt-distribution --parallel 2
@@ -137,6 +139,7 @@ jobs:
       set -e
       sudo xcode-select -s /Applications/Xcode_12.2.app
 
+      cd surge
       cmake -Bbuild -GXcode -D AZURE_PIPELINE=1  -D"CMAKE_OSX_ARCHITECTURES=arm64;x86_64"
 
       cmake --build build --config Release --target surge-xt-distribution | xcpretty
@@ -148,6 +151,7 @@ jobs:
   - bash: |
       set -e
 
+      cd surge
       mkdir -p build
       cmake -Bbuild -A x64 -D AZURE_PIPELINE=1
     condition: and(variables.isWindows, variables.x64)
@@ -156,6 +160,7 @@ jobs:
   - bash: |
       set -e
 
+      cd surge
       mkdir -p build
       cmake -Bbuild -A Win32 -D AZURE_PIPELINE=1 
     condition: and(variables.isWindows, variables.x86)
@@ -165,40 +170,41 @@ jobs:
   - bash: |
       set -e
 
+      cd surge
       cmake --build build --config Release --target surge-xt-distribution
     condition: variables.isWindows
     displayName: win - Build Surge
 
   - bash: |
-      ls -l build/surge_products/
+      ls -l surge/build/surge_products/
     displayName: all - Whats in Surge Products then?
 
 
   - task: PublishPipelineArtifact@0
     inputs:
       artifactName: 'INSTALLER_MAC_ZIP'
-      targetPath: 'build/surge-xt-zip'
+      targetPath: 'surge/build/surge-xt-zip'
     condition: variables.isMac
     displayName: mac - publish windows zip
 
   - task: PublishPipelineArtifact@0
     inputs:
       artifactName: 'INSTALLER_LIN_ZIP'
-      targetPath: 'build/surge-xt-zip'
+      targetPath: 'surge/build/surge-xt-zip'
     condition: variables.isLinux
     displayName: mac - publish windows zip
 
   - task: PublishPipelineArtifact@0
     inputs:
       artifactName: 'INSTALLER_WIN_ZIP'
-      targetPath: 'build/surge-xt-zip'
+      targetPath: 'surge/build/surge-xt-zip'
     condition: and(variables.isWindows, variables.x64)
     displayName: win64 - publish windows zip
 
   - task: PublishPipelineArtifact@0
     inputs:
       artifactName: 'INSTALLER_WIN_X86_EXE'
-      targetPath: 'build/surge-xt-zip'
+      targetPath: 'surge/build/surge-xt-zip'
     condition: and(variables.isWindows, variables.x86)
     displayName: win32 - publish installer
 
