@@ -131,7 +131,7 @@ jobs:
       # cmake --build build --config Release --target surge-xt-distribution --parallel 2
 
       mkdir -p build/surge-xt-zip
-      copy CMakeLists.txt build/surge-xt-zip/foo-lin.zip
+      cp CMakeLists.txt build/surge-xt-zip/foo-lin.zip
     condition: variables.isLinux
     displayName: linux - Build Surge
 
@@ -144,7 +144,7 @@ jobs:
       # cmake -Bbuild -D AZURE_PIPELINE=1  -D"CMAKE_OSX_ARCHITECTURES=arm64;x86_64"
       # cmake --build build --config Release --target surge-xt-distribution --parallel
       mkdir -p build/surge-xt-zip
-      copy CMakeLists.txt build/surge-xt-zip/foo-mac.zip
+      cp CMakeLists.txt build/surge-xt-zip/foo-mac.zip
 
     displayName: macOS - Build Surge
     condition: variables.isMac
@@ -166,7 +166,7 @@ jobs:
       mkdir -p build
       # cmake -Bbuild -A Win32 -D AZURE_PIPELINE=1
       mkdir -p build/surge-xt-zip
-      copy CMakeLists.txt build/surge-xt-zip/foo-win32.zip
+      cp CMakeLists.txt build/surge-xt-zip/foo-win32.zip
 
     condition: and(variables.isWindows, variables.x86)
     displayName: win32 - Setup Project
@@ -178,7 +178,7 @@ jobs:
       cd surge
       # cmake --build build --config Release --target surge-xt-distribution
       mkdir -p build/surge-xt-zip
-      copy CMakeLists.txt build/surge-xt-zip/foo-win64.zip
+      cp CMakeLists.txt build/surge-xt-zip/foo-win64.zip
 
     condition: variables.isWindows
     displayName: win - Build Surge
