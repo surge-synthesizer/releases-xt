@@ -127,10 +127,11 @@ jobs:
       set -e
       cd surge
       
-      cmake -Bbuild -D AZURE_PIPELINE=1 -DCMAKE_INSTALL_PREFIX=/usr
+      # cmake -Bbuild -D AZURE_PIPELINE=1 -DCMAKE_INSTALL_PREFIX=/usr
+      # cmake --build build --config Release --target surge-xt-distribution --parallel 2
 
-      cmake --build build --config Release --target surge-xt-distribution --parallel 2
-
+      mkdir -p build/surge-xt-zip
+      copy CMakeLists.txt build/surge-xt-zip/foo-lin.zip
     condition: variables.isLinux
     displayName: linux - Build Surge
 
@@ -140,8 +141,11 @@ jobs:
       sudo xcode-select -s /Applications/Xcode_12.2.app
 
       cd surge
-      cmake -Bbuild -D AZURE_PIPELINE=1  -D"CMAKE_OSX_ARCHITECTURES=arm64;x86_64"
-      cmake --build build --config Release --target surge-xt-distribution --parallel 
+      # cmake -Bbuild -D AZURE_PIPELINE=1  -D"CMAKE_OSX_ARCHITECTURES=arm64;x86_64"
+      # cmake --build build --config Release --target surge-xt-distribution --parallel
+      mkdir -p build/surge-xt-zip
+      copy CMakeLists.txt build/surge-xt-zip/foo-mac.zip
+
     displayName: macOS - Build Surge
     condition: variables.isMac
 
@@ -151,7 +155,7 @@ jobs:
 
       cd surge
       mkdir -p build
-      cmake -Bbuild -A x64 -D AZURE_PIPELINE=1
+      # cmake -Bbuild -A x64 -D AZURE_PIPELINE=1
     condition: and(variables.isWindows, variables.x64)
     displayName: win64 - Setup Project
 
@@ -160,7 +164,10 @@ jobs:
 
       cd surge
       mkdir -p build
-      cmake -Bbuild -A Win32 -D AZURE_PIPELINE=1 
+      # cmake -Bbuild -A Win32 -D AZURE_PIPELINE=1
+      mkdir -p build/surge-xt-zip
+      copy CMakeLists.txt build/surge-xt-zip/foo-win32.zip
+
     condition: and(variables.isWindows, variables.x86)
     displayName: win32 - Setup Project
 
@@ -169,12 +176,15 @@ jobs:
       set -e
 
       cd surge
-      cmake --build build --config Release --target surge-xt-distribution
+      # cmake --build build --config Release --target surge-xt-distribution
+      mkdir -p build/surge-xt-zip
+      copy CMakeLists.txt build/surge-xt-zip/foo-win64.zip
+
     condition: variables.isWindows
     displayName: win - Build Surge
 
   - bash: |
-      ls -l surge/build/surge_xt_products/
+      # ls -l surge/build/surge_xt_products/
       ls -l surge/build/surge-xt-zip/
     displayName: all - What was built?
 
@@ -253,12 +263,30 @@ jobs:
 
       echo "SURGE_VERSION: $SURGE_VERSION"
 
-      ls -alFh
-
       mkdir -p releases
       mv *.zip releases
 
+      echo "Its the Surge XT Alpha ${SURGE_VERSION}" > releases/ReleaseNotes.md
 
+      ls -alFh releases
+    displayName: Prepare Release
+
+  - task: GitHubRelease@0
+    displayName: "Create Github Release"
+    inputs:
+      gitHubConnection: surge-rackupdater
+      repositoryName: surge-synthesizer/release-xt
+      action: 'edit'
+      tag: Nightly
+      target: '$(Build.SourceVersion)'
+      addChangeLog: false
+      assetUploadMode: 'delete'
+      releaseNotesFile: $(System.DefaultWorkingDirectory)/releases/ReleaseNotes.md
+      assets: $(System.DefaultWorkingDirectory)/releases/*.zip
+
+
+
+  - bash: |
       # Finally tell discord
-      curl -i -H "Accept: application/json" -H "Content-Type:application/json" -X POST --data "{\"content\": \"A SurgeXT Build is finished: \n*${SURGE_VERSION}*\n\"}" `cat $AGENT_TEMPDIRECTORY/discord-nightly.webhook`
-    displayName: Perform Release
+      # curl -i -H "Accept: application/json" -H "Content-Type:application/json" -X POST --data "{\"content\": \"A SurgeXT Build is finished: \n*${SURGE_VERSION}*\n\"}" `cat $AGENT_TEMPDIRECTORY/discord-nightly.webhook`
+    displayName: Tell Discord
