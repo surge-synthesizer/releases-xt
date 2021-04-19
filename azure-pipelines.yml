@@ -176,8 +176,9 @@ jobs:
     displayName: win - Build Surge
 
   - bash: |
-      ls -l surge/build/surge_products/
-    displayName: all - Whats in Surge Products then?
+      ls -l surge/build/surge_xt_products/
+      ls -l surge/build/surge-xt-zip/
+    displayName: all - What was built?
 
 
   - task: PublishPipelineArtifact@0
@@ -185,14 +186,14 @@ jobs:
       artifactName: 'INSTALLER_MAC_ZIP'
       targetPath: 'surge/build/surge-xt-zip'
     condition: variables.isMac
-    displayName: mac - publish windows zip
+    displayName: mac - publish mac zip
 
   - task: PublishPipelineArtifact@0
     inputs:
       artifactName: 'INSTALLER_LIN_ZIP'
       targetPath: 'surge/build/surge-xt-zip'
     condition: variables.isLinux
-    displayName: mac - publish windows zip
+    displayName: linux - publish linux zip
 
   - task: PublishPipelineArtifact@0
     inputs:
