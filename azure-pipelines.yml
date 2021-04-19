@@ -275,7 +275,7 @@ jobs:
     displayName: "Create Github Release"
     inputs:
       gitHubConnection: surge-rackupdater
-      repositoryName: surge-synthesizer/release-xt
+      repositoryName: surge-synthesizer/releases-xt
       action: 'edit'
       tag: Nightly
       target: '$(Build.SourceVersion)'
@@ -288,5 +288,5 @@ jobs:
 
   - bash: |
       # Finally tell discord
-      # curl -i -H "Accept: application/json" -H "Content-Type:application/json" -X POST --data "{\"content\": \"A SurgeXT Build is finished: \n*${SURGE_VERSION}*\n\"}" `cat $AGENT_TEMPDIRECTORY/discord-nightly.webhook`
+      # curl -i -H "Accept: application/json" -H "Content-Type:application/json" -X POST --data "{\"content\": \"A SurgeXT Build is finished: \n*${SURGE_VERSION}*\nhttps://github.com/surge-synthesizer/releases-xt/releases/\"}" `cat $AGENT_TEMPDIRECTORY/discord-nightly.webhook`
     displayName: Tell Discord
