@@ -278,5 +278,5 @@ jobs:
 
   - bash: |
       # Finally tell discord
-      curl -i -H "Accept: application/json" -H "Content-Type:application/json" -X POST --data "{\"content\": \"A SurgeXT Build is finished: \n*${SURGE_VERSION}*\nhttps://github.com/surge-synthesizer/releases-xt/releases/\"}" `cat $AGENT_TEMPDIRECTORY/discord-nightly.webhook`
+      curl -i -H "Accept: application/json" -H "Content-Type:application/json" -X POST --data "{\"content\": \"A SurgeXT Build is finished but you probably dont want to use it. See the faq channel for status: \n*${SURGE_VERSION}*\nhttps://github.com/surge-synthesizer/releases-xt/releases/\"}" `cat $AGENT_TEMPDIRECTORY/discord-nightly.webhook`
     displayName: Tell Discord
