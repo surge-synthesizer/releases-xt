@@ -175,35 +175,35 @@ jobs:
 
   - bash: |
       # ls -l surge/build/surge_xt_products/
-      ls -l surge/build/surge-xt-zip/
+      ls -l surge/build/surge-xt-dist/
     displayName: all - What was built?
 
 
   - task: PublishPipelineArtifact@0
     inputs:
-      artifactName: 'INSTALLER_MAC_ZIP'
-      targetPath: 'surge/build/surge-xt-zip'
+      artifactName: 'INSTALLER_MAC_DIST'
+      targetPath: 'surge/build/surge-xt-dist'
     condition: variables.isMac
     displayName: mac - publish mac zip
 
   - task: PublishPipelineArtifact@0
     inputs:
-      artifactName: 'INSTALLER_LIN_ZIP'
-      targetPath: 'surge/build/surge-xt-zip'
+      artifactName: 'INSTALLER_LIN_DIST'
+      targetPath: 'surge/build/surge-xt-dist'
     condition: variables.isLinux
     displayName: linux - publish linux zip
 
   - task: PublishPipelineArtifact@0
     inputs:
-      artifactName: 'INSTALLER_WIN_ZIP'
-      targetPath: 'surge/build/surge-xt-zip'
+      artifactName: 'INSTALLER_WIN_DIST'
+      targetPath: 'surge/build/surge-xt-dist'
     condition: and(variables.isWindows, variables.x64)
     displayName: win64 - publish windows zip
 
   - task: PublishPipelineArtifact@0
     inputs:
-      artifactName: 'INSTALLER_WIN_X86_ZIP'
-      targetPath: 'surge/build/surge-xt-zip'
+      artifactName: 'INSTALLER_WIN_X86_DIST'
+      targetPath: 'surge/build/surge-xt-dist'
     condition: and(variables.isWindows, variables.x86)
     displayName: win32 - publish installer
 
@@ -229,22 +229,22 @@ jobs:
 
   - task: DownloadPipelineArtifact@0
     inputs:
-      artifactName: 'INSTALLER_MAC_ZIP'
+      artifactName: 'INSTALLER_MAC_DIST'
       targetPath: $(System.DefaultWorkingDirectory)
 
   - task: DownloadPipelineArtifact@0
     inputs:
-      artifactName: 'INSTALLER_WIN_ZIP'
+      artifactName: 'INSTALLER_WIN_DIST'
       targetPath: $(System.DefaultWorkingDirectory)
 
   - task: DownloadPipelineArtifact@0
     inputs:
-      artifactName: 'INSTALLER_WIN_X86_ZIP'
+      artifactName: 'INSTALLER_WIN_X86_DIST'
       targetPath: $(System.DefaultWorkingDirectory)
 
   - task: DownloadPipelineArtifact@0
     inputs:
-      artifactName: 'INSTALLER_LIN_ZIP'
+      artifactName: 'INSTALLER_LIN_DIST'
       targetPath: $(System.DefaultWorkingDirectory)
 
   - bash: |
@@ -254,7 +254,7 @@ jobs:
       echo "SURGE_VERSION: $SURGE_VERSION"
 
       mkdir -p releases
-      mv *.zip releases
+      mv *.zip *.tgz *.dmg *.exe *.deb releases
 
       echo "Its the Surge XT Alpha ${SURGE_VERSION}" > releases/ReleaseNotes.md
 
@@ -272,7 +272,7 @@ jobs:
       addChangeLog: false
       assetUploadMode: 'delete'
       releaseNotesFile: $(System.DefaultWorkingDirectory)/releases/ReleaseNotes.md
-      assets: $(System.DefaultWorkingDirectory)/releases/*.zip
+      assets: $(System.DefaultWorkingDirectory)/releases/*.*
 
 
 
