@@ -254,7 +254,7 @@ jobs:
       echo "SURGE_VERSION: $SURGE_VERSION"
 
       mkdir -p releases
-      mv *.zip *.tgz *.dmg *.exe *.deb releases
+      mv *.zip *.dmg releases
 
       echo "Its the Surge XT Alpha ${SURGE_VERSION}" > releases/ReleaseNotes.md
 
