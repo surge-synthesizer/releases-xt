@@ -39,12 +39,12 @@ jobs:
       set -e
 
       if [ "$SURGE_BRANCH" == "" ]; then
-        export SURGE_LOCAL_BRANCH='xt-alpha'
+        export SURGE_LOCAL_BRANCH='main'
       else
         export SURGE_LOCAL_BRANCH="${SURGE_BRANCH/refs\/heads\/}"
       fi
 
-      if ! [[ $SURGE_LOCAL_BRANCH =~ ^(main|xt-alpha|release/.+)$ ]]; then
+      if ! [[ $SURGE_LOCAL_BRANCH =~ ^(main|release/.+)$ ]]; then
         exit 1
       fi
 
@@ -65,9 +65,6 @@ jobs:
 
       if [ "$SURGE_VERSION" == "main" ]; then
         export SURGE_VERSION="NIGHTLY-$(date +%Y-%m-%d)-$(git rev-parse --short HEAD)"
-      fi
-      if [ "$SURGE_VERSION" == "xt-alpha" ]; then
-        export SURGE_VERSION="XT-NIGHTLY-$(date +%Y-%m-%d)-$(git rev-parse --short HEAD)"
       fi
       echo "SURGE_VERSION=$SURGE_VERSION"
       echo "##vso[task.setvariable variable=SURGE_VERSION]$SURGE_VERSION"
