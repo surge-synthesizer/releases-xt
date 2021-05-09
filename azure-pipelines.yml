@@ -124,7 +124,7 @@ jobs:
       
       cmake -Bbuild -D AZURE_PIPELINE=1 -DCMAKE_INSTALL_PREFIX=/usr
       cmake --build build --config Release --target surge-xt-distribution --parallel 2
-      #cmake --build build --config Release --target surge-xt-rpm --parallel 2
+      cmake --build build --config Release --target surge-xt-rpm --parallel 2
 
     condition: variables.isLinux
     displayName: linux - Build Surge
@@ -250,7 +250,7 @@ jobs:
       echo "SURGE_VERSION: $SURGE_VERSION"
 
       mkdir -p releases
-      mv *.zip *.exe *.dmg *deb releases
+      mv *.zip *.exe *.dmg *.deb *.gz *.rpm releases
 
       echo "Its the Surge XT Alpha ${SURGE_VERSION}" > releases/ReleaseNotes.md
 
