@@ -171,26 +171,6 @@ jobs:
       ls -l surge/build/surge-xt-dist/
     displayName: all - What was built?
 
-  # Finally make the git info
-  - bash: |
-      mkdir -p stage_git/git_info
-      git log -1 --pretty=format:'%h : %s - %an' > stage_git/git_info/git_nightly_xt_log_display
-      git log -1 --pretty=format:'%h : %s%n%aD%n%an%n%n%B' > stage_git/git_info/git_nightly_xt_log_long_display
-      git log -5 --pretty=format:'%h : %s - %an' > stage_git/git_info/git_nightly_xt_recent_five
-      git log -1 --pretty=format:'%h' > stage_git/git_info/git_nightly_xt_log_hash
-
-      cat stage_git/git_info/*
-
-    condition: variables.isLinux
-    displayName: Use the linux build to make git log info
-
-  - task: PublishPipelineArtifact@0
-    inputs:
-      artifactName: 'GIT_INFO'
-      targetPath: 'stage_git/'
-    condition: variables.isLinux
-    displayName: Publish the Git Info
-
 
   - task: PublishPipelineArtifact@0
     inputs:
@@ -240,10 +220,6 @@ jobs:
     inputs:
       secureFile: discord-nightly.webhook
 
-  - task: DownloadSecureFile@1
-    inputs:
-      secureFile: checkout-website.sh
-
   - task: DownloadPipelineArtifact@0
     inputs:
       artifactName: 'INSTALLER_MAC_DIST'
@@ -264,11 +240,6 @@ jobs:
       artifactName: 'INSTALLER_LIN_DIST'
       targetPath: $(System.DefaultWorkingDirectory)
 
-  - task: DownloadPipelineArtifact@0
-    inputs:
-      artifactName: 'GIT_INFO'
-      targetPath: $(System.DefaultWorkingDirectory)
-
   - bash: |
       set -e
       set -x
@@ -278,11 +249,7 @@ jobs:
       mkdir -p releases
       mv *.zip *.exe *.dmg *.deb *.gz *.rpm releases
 
-      echo "Surge XT Alpha ${SURGE_VERSION}" > releases/ReleaseNotes.md
-      echo " " >> releases/ReleaseNotes.md
-      echo "```" >> releases/ReleaseNotes.md
-      cat git_info/git_nightly_xt_recent_five >> releases/ReleaseNotes.md
-      echo "```" >> releases/ReleaseNotes.md
+      echo "Its the Surge XT Alpha ${SURGE_VERSION}" > releases/ReleaseNotes.md
 
       ls -alFh releases
     displayName: Prepare Release
@@ -301,29 +268,8 @@ jobs:
       assets: $(System.DefaultWorkingDirectory)/releases/*.*
 
 
-  - bash: |
-        # Move the website generation here before the release to avoid web rebuild latency being quite as bad
-      . $AGENT_TEMPDIRECTORY/checkout-website.sh 
-
-      pushd surge-synthesizer.github.io
-
-      if [ "$SURGE_LOCAL_BRANCH" == "NIGHTLY" ]; then
-        echo $(date "+%Y-%m-%d %H:%M:%S %Z") > _includes/latest_xt_build_time
-        echo $SURGE_VERSION > _includes/latest_xt_version
-        cp ../git_info/* _includes
-      else
-        echo "DEAL WITH RELEASE"
-      fi
-
-      git diff
-      git add _includes
-      git commit -m "Update releases for $SURGE_VERSION"
-      git push
-      export GIT_LOG_DISP=`cat _includes/git_nightly_xt_log_display`
-      popd
-    displayName: Update Website
 
   - bash: |
       # Finally tell discord
-      curl -i -H "Accept: application/json" -H "Content-Type:application/json" -X POST --data "{\"content\": \"A SurgeXT Build is finished but you probably dont want to use it. See the faq channel for status: \n*${SURGE_VERSION}*\nhttps://surge-synthesizer.github.io/nightly_XT/\"}" `cat $AGENT_TEMPDIRECTORY/discord-nightly.webhook`
+      curl -i -H "Accept: application/json" -H "Content-Type:application/json" -X POST --data "{\"content\": \"A SurgeXT Build is finished but you probably dont want to use it. See the faq channel for status: \n*${SURGE_VERSION}*\nhttps://github.com/surge-synthesizer/releases-xt/releases/\"}" `cat $AGENT_TEMPDIRECTORY/discord-nightly.webhook`
     displayName: Tell Discord
