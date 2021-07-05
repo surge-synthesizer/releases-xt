@@ -319,12 +319,10 @@ jobs:
       git diff
       git add _includes
       git commit -m "Update releases for $SURGE_VERSION"
-      git push
-      export GIT_LOG_DISP=`cat _includes/git_nightly_xt_log_display`
-      popd
     displayName: Update Website
 
   - bash: |
       # Finally tell discord
-      curl -i -H "Accept: application/json" -H "Content-Type:application/json" -X POST --data "{\"content\": \"A SurgeXT Build is finished but it is still pretty alpha. Feel lucky? See the faq channel for status: \n*${SURGE_VERSION}*\nhttps://surge-synthesizer.github.io/nightly_XT\"}" `cat $AGENT_TEMPDIRECTORY/discord-nightly.webhook`
+      export GIT_LOG_DISP=`cat git_info/git_nightly_xt_log_display`
+      curl -i -H "Accept: application/json" -H "Content-Type:application/json" -X POST --data "{\"content\": \"A SurgeXT Build is finished but it is still pretty alpha. Feel lucky? See the faq channel for status: \n*${SURGE_VERSION}*\n${GIT_LOG_DISP}\nhttps://surge-synthesizer.github.io/nightly_XT\"}" `cat $AGENT_TEMPDIRECTORY/discord-nightly.webhook`
     displayName: Tell Discord
