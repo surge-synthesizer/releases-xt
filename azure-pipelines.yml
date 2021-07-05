@@ -231,7 +231,7 @@ jobs:
 
   variables:
     SURGE_VERSION: $[ dependencies.Build.outputs['mac.surge.SURGE_VERSION'] ]
-    SURGE_BRANCH: $[ dependencies.Build.outputs['mac.surge.SURGE_LOCAL_BRANCH'] ]
+    SURGE_LOCAL_BRANCH: $[ dependencies.Build.outputs['mac.surge.SURGE_LOCAL_BRANCH'] ]
 
   steps:
   - checkout: self
@@ -306,7 +306,7 @@ jobs:
 
       pushd surge-synthesizer.github.io
 
-      if [ "$SURGE_LOCAL_BRANCH" == "NIGHTLY" ]; then
+      if [ "$SURGE_LOCAL_BRANCH" == "main" ]; then
         echo $(date "+%Y-%m-%d %H:%M:%S %Z") > _includes/latest_xt_build_time
         echo $SURGE_VERSION > _includes/latest_xt_version
         cp ../git_info/* _includes
