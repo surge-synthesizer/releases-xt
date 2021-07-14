@@ -319,6 +319,7 @@ jobs:
       git diff
       git add _includes
       git commit -m "Update releases for $SURGE_VERSION"
+      git push
     displayName: Update Website
 
   - bash: |
