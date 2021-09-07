@@ -171,6 +171,17 @@ jobs:
       ls -l surge/build/surge-xt-dist/
     displayName: all - What was built?
 
+
+  # Make the tarball
+  - bash: |
+      cd surge
+      ./scripts/misc/build-version-override.sh
+      cd ..
+      tar --exclude='./surge/ignore' --exclude='./surge/.git' --exclude='./surge/build*' -czvf surge-src-${SURGE_VERSION}.tar.gz surge/build/surge-xt-dist
+      ls -al surge/build/surge-xt-dist/*.tar.gz
+    condition: variables.isLinux
+    displayName: linux - make tarball
+    
   # Finally make the git info
   - bash: |
       mkdir -p stage_git/git_info
