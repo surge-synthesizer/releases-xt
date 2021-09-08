@@ -247,7 +247,7 @@ jobs:
   variables:
     SURGE_VERSION: $[ dependencies.Build.outputs['mac.surge.SURGE_VERSION'] ]
     SURGE_LOCAL_BRANCH: $[ dependencies.Build.outputs['mac.surge.SURGE_LOCAL_BRANCH'] ]
-    isMain: $[eq( dependencies.Build.outputs['mac.surge.SURGE_LOCAL_BRANCH'], 'main')]
+    isMain: $[eq( variables.SURGE_LOCAL_BRANCH, 'main')]
 
   steps:
   - checkout: self
