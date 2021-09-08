@@ -48,9 +48,14 @@ jobs:
         exit 1
       fi
 
+      if ! [[ $SURGE_LOCAL_BRANCH =~ ^(main)$ ]]; then
+        echo "##vso[task.setvariable variable=isMain;isOutput=true]true"
+      else
+        echo "##vso[task.setvariable variable=isMain;isOutput=true]false"
+      fi
+
       echo "SURGE_BRANCH=${SURGE_BRANCH}"
       echo "SURGE_LOCAL_BRANCH=$SURGE_LOCAL_BRANCH"
-      echo "##vso[task.setvariable variable=SURGE_LOCAL_BRANCH]$SURGE_LOCAL_BRANCH"
       echo "##vso[task.setvariable variable=SURGE_LOCAL_BRANCH;isOutput=true]$SURGE_LOCAL_BRANCH"
 
       export SURGE_VERSION="${SURGE_LOCAL_BRANCH##*/}"
@@ -68,7 +73,6 @@ jobs:
         export SURGE_VERSION="NIGHTLY-$(date +%Y-%m-%d)-$(git rev-parse --short HEAD)"
       fi
       echo "SURGE_VERSION=$SURGE_VERSION"
-      echo "##vso[task.setvariable variable=SURGE_VERSION]$SURGE_VERSION"
       echo "##vso[task.setvariable variable=SURGE_VERSION;isOutput=true]$SURGE_VERSION"
     name: surge
     displayName: all - Setup Source and Version
@@ -247,7 +251,7 @@ jobs:
   variables:
     SURGE_VERSION: $[ dependencies.Build.outputs['mac.surge.SURGE_VERSION'] ]
     SURGE_LOCAL_BRANCH: $[ dependencies.Build.outputs['mac.surge.SURGE_LOCAL_BRANCH'] ]
-    isMain: $[eq(dependencies.Build.outputs['mac.surge.SURGE_LOCAL_BRANCH'], 'main')]
+    isMain: $[ dependencies.Build.outputs['mac.surge.isMain'] ]
 
   steps:
   - checkout: self
@@ -290,18 +294,22 @@ jobs:
       set -x
 
       echo "SURGE_VERSION: $SURGE_VERSION"
+      echo "SURGE_LOCAL_BRANCH: $SURGE_LOCAL_BRANCH"
+      echo "isMain: $isMain"
 
       mkdir -p releases
+      ls $(System.DefaultWorkingDirectory)/git_info
+      
       mv *.zip *.exe *.dmg *.deb *.gz *.rpm releases
 
       echo "Surge XT ${SURGE_VERSION}" > releases/ReleaseNotes.md
       echo " " >> releases/ReleaseNotes.md
-      echo "```" >> releases/ReleaseNotes.md
-      cat git_info/git_nightly_xt_recent_five >> releases/ReleaseNotes.md
-      echo "```" >> releases/ReleaseNotes.md
+      echo "<pre>" >> releases/ReleaseNotes.md
+      cat $(System.DefaultWorkingDirectory)/git_info/git_nightly_xt_recent_five >> releases/ReleaseNotes.md
+      echo "</pre>" >> releases/ReleaseNotes.md
 
       echo "---------------"
-      cat release/ReleaseNotes.md
+      cat releases/ReleaseNotes.md
       echo "---------------"
 
       ls -alFh releases
