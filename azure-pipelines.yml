@@ -177,7 +177,7 @@ jobs:
       cd surge
       ./scripts/misc/build-version-override.sh
       cd ..
-      tar --exclude='./surge/ignore' --exclude='./surge/.git' --exclude='./surge/build*' -czvf surge/build/surge-xt-dist/surge-src-${SURGE_VERSION}.tar.gz surge
+      tar --exclude='./surge/ignore' --exclude='./surge/.git' --exclude='./surge/build*' -czvf surge/build/surge-xt-dist/surge-src-${SURGE_VERSION}.tar.gz ./surge
       ls -al surge/build/surge-xt-dist/*.tar.gz
     condition: variables.isLinux
     displayName: linux - make tarball
