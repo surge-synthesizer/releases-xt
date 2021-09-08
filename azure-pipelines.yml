@@ -34,7 +34,6 @@ jobs:
   - checkout: none
 
 ### SETUP SECTION
-
   - bash: |
       set -e
 
@@ -49,14 +48,19 @@ jobs:
       fi
 
       if ! [[ $SURGE_LOCAL_BRANCH =~ ^(main)$ ]]; then
-        echo "##vso[task.setvariable variable=isMain;isOutput=true]true"
+        export SURGE_IS_MAIN='true'
       else
-        echo "##vso[task.setvariable variable=isMain;isOutput=true]false"
+        export SURGE_IS_MAIN='false'
       fi
 
       echo "SURGE_BRANCH=${SURGE_BRANCH}"
       echo "SURGE_LOCAL_BRANCH=$SURGE_LOCAL_BRANCH"
       echo "##vso[task.setvariable variable=SURGE_LOCAL_BRANCH;isOutput=true]$SURGE_LOCAL_BRANCH"
+
+      echo "SURGE_IS_MAIN=${SURGE_IS_MAIN}"
+      echo "##vso[task.setvariable variable=SURGE_IS_MAIN]$SURGE_IS_MAIN"
+      echo "##vso[task.setvariable variable=SURGE_IS_MAIN;isOutput=true]$SURGE_IS_MAIN"
+      echo "-- vso[task.setvariable variable=SURGE_IS_MAIN;isOutput=true]$SURGE_IS_MAIN"
 
       export SURGE_VERSION="${SURGE_LOCAL_BRANCH##*/}"
       echo "SURGE_VERSION=$SURGE_VERSION"
@@ -251,7 +255,7 @@ jobs:
   variables:
     SURGE_VERSION: $[ dependencies.Build.outputs['mac.surge.SURGE_VERSION'] ]
     SURGE_LOCAL_BRANCH: $[ dependencies.Build.outputs['mac.surge.SURGE_LOCAL_BRANCH'] ]
-    isMain: $[ dependencies.Build.outputs['mac.surge.isMain'] ]
+    SURGE_IS_MAIN: $[ dependencies.Build.outputs['mac.surge.SURGE_IS_MAIN'] ]
 
   steps:
   - checkout: self
@@ -295,7 +299,7 @@ jobs:
 
       echo "SURGE_VERSION: $SURGE_VERSION"
       echo "SURGE_LOCAL_BRANCH: $SURGE_LOCAL_BRANCH"
-      echo "isMain: $isMain"
+      echo "SURGE_IS_MAIN: $SURGE_IS_MAIN"
 
       mkdir -p releases
       ls $(System.DefaultWorkingDirectory)/git_info
@@ -306,6 +310,7 @@ jobs:
       echo " " >> releases/ReleaseNotes.md
       echo "<pre>" >> releases/ReleaseNotes.md
       cat $(System.DefaultWorkingDirectory)/git_info/git_nightly_xt_recent_five >> releases/ReleaseNotes.md
+      echo " " >> releases/ReleaseNotes.md
       echo "</pre>" >> releases/ReleaseNotes.md
 
       echo "---------------"
@@ -317,7 +322,7 @@ jobs:
 
   - task: GitHubRelease@0
     displayName: "Create Github Nightly Release"
-    condition: variables.isMain
+    condition: variables.SURGE_IS_MAIN
     inputs:
       gitHubConnection: surge-rackupdater
       repositoryName: surge-synthesizer/releases-xt
@@ -331,7 +336,7 @@ jobs:
 
   - task: GitHubRelease@0
     displayName: "Create Github Stable Release"
-    condition: not(variables.isMain)
+    condition: not(variables.SURGE_IS_MAIN)
     inputs:
       gitHubConnection: surge-rackupdater
       repositoryName: surge-synthesizer/releases-xt
