@@ -247,7 +247,7 @@ jobs:
   variables:
     SURGE_VERSION: $[ dependencies.Build.outputs['mac.surge.SURGE_VERSION'] ]
     SURGE_LOCAL_BRANCH: $[ dependencies.Build.outputs['mac.surge.SURGE_LOCAL_BRANCH'] ]
-    isMain: $[eq( variables.SURGE_LOCAL_BRANCH, 'main')]
+    isMain: $[eq(dependencies.Build.outputs['mac.surge.SURGE_LOCAL_BRANCH'], 'main')]
 
   steps:
   - checkout: self
@@ -309,7 +309,7 @@ jobs:
 
   - task: GitHubRelease@0
     displayName: "Create Github Nightly Release"
-    condition: isMain
+    condition: variables.isMain
     inputs:
       gitHubConnection: surge-rackupdater
       repositoryName: surge-synthesizer/releases-xt
@@ -323,7 +323,7 @@ jobs:
 
   - task: GitHubRelease@0
     displayName: "Create Github Stable Release"
-    condition: not(isMain)
+    condition: not(variables.isMain)
     inputs:
       gitHubConnection: surge-rackupdater
       repositoryName: surge-synthesizer/releases-xt
