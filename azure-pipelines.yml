@@ -34,7 +34,6 @@ jobs:
   - checkout: none
 
 ### SETUP SECTION
-
   - bash: |
       set -e
 
@@ -44,13 +43,27 @@ jobs:
         export SURGE_LOCAL_BRANCH="${SURGE_BRANCH/refs\/heads\/}"
       fi
 
-      if ! [[ $SURGE_LOCAL_BRANCH =~ ^(main|release/.+)$ ]]; then
+      if ! [[ $SURGE_LOCAL_BRANCH =~ ^(main|release-xt/.+)$ ]]; then
         exit 1
       fi
 
+      if [[ $SURGE_LOCAL_BRANCH =~ ^(main)$ ]]; then
+        export SURGE_IS_MAIN=true
+        echo "SURGE_IS_MAIN TRUE"
+        echo "##vso[task.setvariable variable=SURGE_IS_MAIN]true"
+        echo "##vso[task.setvariable variable=SURGE_IS_MAIN;isOutput=true]true"
+      else
+        export SURGE_IS_MAIN=false
+        echo "SURGE_IS_MAIN FALSE"
+        echo "##vso[task.setvariable variable=SURGE_IS_MAIN]false"
+        echo "##vso[task.setvariable variable=SURGE_IS_MAIN;isOutput=true]false"
+      fi
+
+      echo "SURGE_BRANCH=${SURGE_BRANCH}"
       echo "SURGE_LOCAL_BRANCH=$SURGE_LOCAL_BRANCH"
       echo "##vso[task.setvariable variable=SURGE_LOCAL_BRANCH]$SURGE_LOCAL_BRANCH"
       echo "##vso[task.setvariable variable=SURGE_LOCAL_BRANCH;isOutput=true]$SURGE_LOCAL_BRANCH"
+
 
       export SURGE_VERSION="${SURGE_LOCAL_BRANCH##*/}"
       echo "SURGE_VERSION=$SURGE_VERSION"
@@ -67,7 +80,8 @@ jobs:
         export SURGE_VERSION="NIGHTLY-$(date +%Y-%m-%d)-$(git rev-parse --short HEAD)"
       fi
       echo "SURGE_VERSION=$SURGE_VERSION"
-      echo "##vso[task.setvariable variable=SURGE_VERSION]$SURGE_VERSION"
+      
+      echo "##vso[task.setvariable variable=SURGE_VERSION;]$SURGE_VERSION"
       echo "##vso[task.setvariable variable=SURGE_VERSION;isOutput=true]$SURGE_VERSION"
     name: surge
     displayName: all - Setup Source and Version
@@ -132,7 +146,7 @@ jobs:
       sudo xcode-select -s /Applications/Xcode_12.2.app
 
       cd surge
-      cmake -Bbuild -D AZURE_PIPELINE=1  -D"CMAKE_OSX_ARCHITECTURES=arm64;x86_64"
+      cmake -Bbuild -D AZURE_PIPELINE=1 -D"CMAKE_OSX_ARCHITECTURES=arm64;x86_64"
       cmake --build build --config Release --target surge-xt-distribution --parallel
 
     displayName: macOS - Build Surge
@@ -245,9 +259,12 @@ jobs:
   variables:
     SURGE_VERSION: $[ dependencies.Build.outputs['mac.surge.SURGE_VERSION'] ]
     SURGE_LOCAL_BRANCH: $[ dependencies.Build.outputs['mac.surge.SURGE_LOCAL_BRANCH'] ]
+    SURGE_IS_MAIN: $[ dependencies.Build.outputs['mac.surge.SURGE_IS_MAIN'] ]
+    INSTALL_TO_NIGHTLY: $[ eq( variables.SURGE_IS_MAIN, 'true') ]
 
   steps:
   - checkout: self
+    persistCredentials: true
 
   - task: DownloadSecureFile@1
     inputs:
@@ -287,26 +304,58 @@ jobs:
       set -x
 
       echo "SURGE_VERSION: $SURGE_VERSION"
+      echo "SURGE_LOCAL_BRANCH: $SURGE_LOCAL_BRANCH"
+      echo "SURGE_IS_MAIN: $SURGE_IS_MAIN"
+      echo "INSTALL_TO_NIGHTLY: $INSTALL_TO_NIGHTLY"
 
       mkdir -p releases
+      ls $(System.DefaultWorkingDirectory)/git_info
+      
       mv *.zip *.exe *.dmg *.deb *.gz *.rpm releases
 
-      echo "Surge XT Alpha ${SURGE_VERSION}" > releases/ReleaseNotes.md
+      echo "Surge XT ${SURGE_VERSION}" > releases/ReleaseNotes.md
       echo " " >> releases/ReleaseNotes.md
-      echo "```" >> releases/ReleaseNotes.md
-      cat git_info/git_nightly_xt_recent_five >> releases/ReleaseNotes.md
-      echo "```" >> releases/ReleaseNotes.md
+      echo "<pre>" >> releases/ReleaseNotes.md
+      cat $(System.DefaultWorkingDirectory)/git_info/git_nightly_xt_recent_five >> releases/ReleaseNotes.md
+      echo " " >> releases/ReleaseNotes.md
+      echo "</pre>" >> releases/ReleaseNotes.md
+
+      echo "---------------"
+      cat releases/ReleaseNotes.md
+      echo "---------------"
 
       ls -alFh releases
     displayName: Prepare Release
 
   - task: GitHubRelease@0
-    displayName: "Create Github Release"
+    displayName: "Create Github Nightly Release"
+    condition: eq(variables.SURGE_IS_MAIN, 'true')
     inputs:
       gitHubConnection: surge-rackupdater
       repositoryName: surge-synthesizer/releases-xt
       action: 'edit'
       tag: Nightly
+      target: '$(Build.SourceVersion)'
+      addChangeLog: false
+      assetUploadMode: 'delete'
+      releaseNotesFile: $(System.DefaultWorkingDirectory)/releases/ReleaseNotes.md
+      assets: $(System.DefaultWorkingDirectory)/releases/*.*
+
+  - bash: |
+       git tag $(SURGE_VERSION)
+       git push origin $(SURGE_VERSION)
+    displayName: "Create Github Tag for Stable"
+    condition: eq(variables.SURGE_IS_MAIN, 'false')
+
+  - task: GitHubRelease@0
+    displayName: "Create Github Stable Release"
+    condition: eq(variables.SURGE_IS_MAIN, 'false')
+    inputs:
+      gitHubConnection: surge-rackupdater
+      repositoryName: surge-synthesizer/releases-xt
+      action: 'create'
+      tag: $(SURGE_VERSION)
+      tagSource: 'auto'
       target: '$(Build.SourceVersion)'
       addChangeLog: false
       assetUploadMode: 'delete'
@@ -324,7 +373,8 @@ jobs:
         echo $SURGE_VERSION > _includes/latest_xt_version
         cp ../git_info/* _includes
       else
-        echo "DEAL WITH RELEASE"
+        echo $(date "+%Y-%m-%d %H:%M:%S %Z") > _includes/stable_xt_build_time
+        echo $SURGE_VERSION > _includes/stable_xt_version
       fi
 
       git diff
