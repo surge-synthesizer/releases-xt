@@ -263,7 +263,7 @@ jobs:
 
   steps:
   - checkout: self
-    persisteCredentials: true
+    persistCredentials: true
 
   - task: DownloadSecureFile@1
     inputs:
