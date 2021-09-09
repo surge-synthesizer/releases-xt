@@ -263,6 +263,7 @@ jobs:
 
   steps:
   - checkout: self
+    persisteCredentials: true
 
   - task: DownloadSecureFile@1
     inputs:
@@ -338,6 +339,12 @@ jobs:
       assetUploadMode: 'delete'
       releaseNotesFile: $(System.DefaultWorkingDirectory)/releases/ReleaseNotes.md
       assets: $(System.DefaultWorkingDirectory)/releases/*.*
+
+  - bash: |
+       git tag $(SURGE_VERSION)
+       git push origin $(SURGE_VERSION)
+    displayName: "Create Github Tag for Stable"
+    condition: eq(variables.SURGE_IS_MAIN, 'false')
 
   - task: GitHubRelease@0
     displayName: "Create Github Stable Release"
