@@ -259,6 +259,7 @@ jobs:
     SURGE_VERSION: $[ dependencies.Build.outputs['mac.surge.SURGE_VERSION'] ]
     SURGE_LOCAL_BRANCH: $[ dependencies.Build.outputs['mac.surge.SURGE_LOCAL_BRANCH'] ]
     SURGE_IS_MAIN: $[ dependencies.Build.outputs['mac.surge.SURGE_IS_MAIN'] ]
+    INSTALL_TO_NIGHTLY: $[ eq( variables.SURGE_IS_MAIN, 'true') ]
 
   steps:
   - checkout: self
@@ -303,6 +304,7 @@ jobs:
       echo "SURGE_VERSION: $SURGE_VERSION"
       echo "SURGE_LOCAL_BRANCH: $SURGE_LOCAL_BRANCH"
       echo "SURGE_IS_MAIN: $SURGE_IS_MAIN"
+      echo "INSTALL_TO_NIGHTLY: $INSTALL_TO_NIGHTLY"
 
       mkdir -p releases
       ls $(System.DefaultWorkingDirectory)/git_info
@@ -325,7 +327,7 @@ jobs:
 
   - task: GitHubRelease@0
     displayName: "Create Github Nightly Release"
-    condition: variables.SURGE_IS_MAIN
+    condition: variables.INSTALL_TO_NIGHTLY
     inputs:
       gitHubConnection: surge-rackupdater
       repositoryName: surge-synthesizer/releases-xt
@@ -339,7 +341,7 @@ jobs:
 
   - task: GitHubRelease@0
     displayName: "Create Github Stable Release"
-    condition: not(variables.SURGE_IS_MAIN)
+    condition: not(variables.INSTALL_TO_NIGHTLY)
     inputs:
       gitHubConnection: surge-rackupdater
       repositoryName: surge-synthesizer/releases-xt
