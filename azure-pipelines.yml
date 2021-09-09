@@ -48,18 +48,21 @@ jobs:
       fi
 
       if [[ $SURGE_LOCAL_BRANCH =~ ^(main)$ ]]; then
-        export SURGE_IS_MAIN='true'
+        export SURGE_IS_MAIN=true
+        echo "SURGE_IS_MAIN TRUE"
+        echo "##vso[task.setvariable variable=SURGE_IS_MAIN]true"
+        echo "##vso[task.setvariable variable=SURGE_IS_MAIN;isOutput=true]true"
       else
-        export SURGE_IS_MAIN='false'
+        export SURGE_IS_MAIN=false
+        echo "SURGE_IS_MAIN FALSE"
+        echo "##vso[task.setvariable variable=SURGE_IS_MAIN]false"
+        echo "##vso[task.setvariable variable=SURGE_IS_MAIN;isOutput=true]false"
       fi
 
       echo "SURGE_BRANCH=${SURGE_BRANCH}"
       echo "SURGE_LOCAL_BRANCH=$SURGE_LOCAL_BRANCH"
       echo "##vso[task.setvariable variable=SURGE_LOCAL_BRANCH;isOutput=true]$SURGE_LOCAL_BRANCH"
 
-      echo "SURGE_IS_MAIN=${SURGE_IS_MAIN}"
-      echo "##vso[task.setvariable variable=SURGE_IS_MAIN]$SURGE_IS_MAIN"
-      echo "##vso[task.setvariable variable=SURGE_IS_MAIN;isOutput=true]$SURGE_IS_MAIN"
       echo "-- vso[task.setvariable variable=SURGE_IS_MAIN;isOutput=true]$SURGE_IS_MAIN"
 
       export SURGE_VERSION="${SURGE_LOCAL_BRANCH##*/}"
