@@ -47,7 +47,7 @@ jobs:
         exit 1
       fi
 
-      if ! [[ $SURGE_LOCAL_BRANCH =~ ^(main)$ ]]; then
+      if [[ $SURGE_LOCAL_BRANCH =~ ^(main)$ ]]; then
         export SURGE_IS_MAIN='true'
       else
         export SURGE_IS_MAIN='false'
