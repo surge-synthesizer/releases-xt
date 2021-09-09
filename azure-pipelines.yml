@@ -347,6 +347,7 @@ jobs:
       repositoryName: surge-synthesizer/releases-xt
       action: 'create'
       tag: $(SURGE_VERSION)
+      tagSource: 'auto'
       target: '$(Build.SourceVersion)'
       addChangeLog: false
       assetUploadMode: 'delete'
