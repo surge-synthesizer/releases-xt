@@ -327,7 +327,7 @@ jobs:
 
   - task: GitHubRelease@0
     displayName: "Create Github Nightly Release"
-    condition: variables.INSTALL_TO_NIGHTLY
+    condition: eq(variables.SURGE_IS_MAIN, 'true')
     inputs:
       gitHubConnection: surge-rackupdater
       repositoryName: surge-synthesizer/releases-xt
@@ -341,7 +341,7 @@ jobs:
 
   - task: GitHubRelease@0
     displayName: "Create Github Stable Release"
-    condition: not(variables.INSTALL_TO_NIGHTLY)
+    condition: eq(variables.SURGE_IS_MAIN, 'false')
     inputs:
       gitHubConnection: surge-rackupdater
       repositoryName: surge-synthesizer/releases-xt
