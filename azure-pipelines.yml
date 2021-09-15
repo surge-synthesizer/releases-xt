@@ -135,7 +135,7 @@ jobs:
       
       cmake -Bbuild -D AZURE_PIPELINE=1 -DCMAKE_INSTALL_PREFIX=/usr
       cmake --build build --config Release --target surge-xt-distribution --parallel 2
-      cmake --build build --config Release --target surge-xt-rpm --parallel 2
+      # cmake --build build --config Release --target surge-xt-rpm --parallel 2
 
     condition: variables.isLinux
     displayName: linux - Build Surge
