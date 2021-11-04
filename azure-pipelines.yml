@@ -16,11 +16,11 @@ jobs:
         imageName: 'macos-10.15'
         isMac: true
       windows:
-        imageName: 'vs2017-win2016'
+        imageName: 'windows-2019'
         isWindows: true
         x64: true
       windows-x86:
-        imageName: 'vs2017-win2016'
+        imageName: 'windows-2019'
         isWindows: true
         x86: true
       linux:
