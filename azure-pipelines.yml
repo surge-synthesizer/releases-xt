@@ -158,7 +158,7 @@ jobs:
       cd surge/scripts/installer_mac
       ./dummy_installer.sh
     condition: variables.isMac
-    name: dummy sign
+
 
 
 #### DO THE SURGE BUILDS
