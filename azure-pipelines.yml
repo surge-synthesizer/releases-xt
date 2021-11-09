@@ -142,21 +142,6 @@ jobs:
       certPwd: '$(MAC_EXPORTED_CERT_PW)'
     condition : variables.isMac
 
-  - bash: |
-      set -e
-
-      cd surge/scripts/installer_mac
-      ./dummy_installer.sh
-    condition: variables.isMac
-    env:
-      MAC_INSTALLING_CERT: $(MAC_INSTALLING_CERT)
-      MAC_SIGNING_1UPW: $(MAC_SIGNING_1UPW)
-      MAC_SIGNING_CERT: $(MAC_SIGNING_CERT)
-      MAC_SIGNING_ID: $(MAC_SIGNING_ID)
-      MAC_SIGNING_TEAM: $(MAC_SIGNING_TEAM)
-
-
-
 #### DO THE SURGE BUILDS
 
   - bash: |
