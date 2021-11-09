@@ -5,9 +5,9 @@ trigger: none
 
 variables:
   - group: mac-signing
-  - name: DECODE_PERCENTS
-    value: false
 
+variables:
+   DECODE_PERCENTS: false
 
 jobs:
 
@@ -145,13 +145,14 @@ jobs:
 
   - bash: |
       set -e
-      echo $(MAC_INSTALLING_CERT)
+      echo "MAC CERT" 
+      echo ${{ variables.MAC_INSTALLING_CERT }}
 
-      export MAC_INSTALLING_CERT="$(MAC_INSTALLING_CERT)"
-      export MAC_SIGNING_1UPW="$(MAC_SIGNING_1UPW)"
-      export MAC_SIGNING_CERT="$(MAC_SIGNING_CERT)"
-      export MAC_SIGNING_ID="$(MAC_SIGNING_ID)"
-      export MAC_SIGNING_TEAM=$(MAC_SIGNING_TEAM)"
+      #export MAC_INSTALLING_CERT="$(MAC_INSTALLING_CERT)"
+      #export MAC_SIGNING_1UPW="$(MAC_SIGNING_1UPW)"
+      #export MAC_SIGNING_CERT="$(MAC_SIGNING_CERT)"
+      #export MAC_SIGNING_ID="$(MAC_SIGNING_ID)"
+      #export MAC_SIGNING_TEAM=$(MAC_SIGNING_TEAM)"
 
       cd surge/scripts/installer_mac
       ./dummy_installer.sh
