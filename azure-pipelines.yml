@@ -152,8 +152,6 @@ jobs:
       export MAC_SIGNING_ID="$(MAC_SIGNING_ID)"
       export MAC_SIGNING_TEAM=$(MAC_SIGNING_TEAM)"
 
-      echo "Signing with $MAC_SIGNING_TEAM"
-
       cd surge/scripts/installer_mac
       ./dummy_installer.sh
     condition: variables.isMac
