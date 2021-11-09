@@ -144,8 +144,7 @@ jobs:
 
   - bash: |
       set -e
-      echo "MAC CERT" 
-      echo ${{ variables.MAC_INSTALLING_CERT }}
+      echo "MAC CERT ${MAC_INSTALLING_CERT}" 
 
       #export MAC_INSTALLING_CERT="$(MAC_INSTALLING_CERT)"
       #export MAC_SIGNING_1UPW="$(MAC_SIGNING_1UPW)"
@@ -156,6 +155,8 @@ jobs:
       cd surge/scripts/installer_mac
       ./dummy_installer.sh
     condition: variables.isMac
+    env:
+      MAC_INSTALLING_CERT: $(MAC_INSTALLING_CERT)
 
 
 
