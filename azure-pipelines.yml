@@ -145,6 +145,7 @@ jobs:
 
   - bash: |
       set -e
+      echo $(MAC_INSTALLING_CERT)
 
       export MAC_INSTALLING_CERT="$(MAC_INSTALLING_CERT)"
       export MAC_SIGNING_1UPW="$(MAC_SIGNING_1UPW)"
