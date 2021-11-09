@@ -144,19 +144,16 @@ jobs:
 
   - bash: |
       set -e
-      echo "MAC CERT ${MAC_INSTALLING_CERT}" 
-
-      #export MAC_INSTALLING_CERT="$(MAC_INSTALLING_CERT)"
-      #export MAC_SIGNING_1UPW="$(MAC_SIGNING_1UPW)"
-      #export MAC_SIGNING_CERT="$(MAC_SIGNING_CERT)"
-      #export MAC_SIGNING_ID="$(MAC_SIGNING_ID)"
-      #export MAC_SIGNING_TEAM=$(MAC_SIGNING_TEAM)"
 
       cd surge/scripts/installer_mac
       ./dummy_installer.sh
     condition: variables.isMac
     env:
       MAC_INSTALLING_CERT: $(MAC_INSTALLING_CERT)
+      MAC_SIGNING_1UPW: $(MAC_SIGNING_1UPW)
+      MAC_SIGNING_CERT: $(MAC_SIGNING_CERT)
+      MAC_SIGNING_ID: $(MAC_SIGNING_ID)
+      MAC_SIGNING_TEAM: $(MAC_SIGNING_TEAM)
 
 
 
@@ -184,6 +181,12 @@ jobs:
 
     displayName: macOS - Build Surge
     condition: variables.isMac
+    env:
+      MAC_INSTALLING_CERT: $(MAC_INSTALLING_CERT)
+      MAC_SIGNING_1UPW: $(MAC_SIGNING_1UPW)
+      MAC_SIGNING_CERT: $(MAC_SIGNING_CERT)
+      MAC_SIGNING_ID: $(MAC_SIGNING_ID)
+      MAC_SIGNING_TEAM: $(MAC_SIGNING_TEAM)
 
 
   - bash: |
