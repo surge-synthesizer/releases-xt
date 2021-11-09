@@ -145,8 +145,6 @@ jobs:
 
   - bash: |
       set -e
-      ls -ld /Applications/Xc*
-      xcode-select -s /Applications/Xcode_13.0/
 
       export MAC_INSTALLING_CERT="$(MAC_INSTALLING_CERT)"
       export MAC_SIGNING_1UPW="$(MAC_SIGNING_1UPW)"
