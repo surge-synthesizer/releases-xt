@@ -4,8 +4,10 @@
 trigger: none
 
 variables:
-  DECODE_PERCENTS: false
   - group: mac-signing
+  - name: DECODE_PERCENTS
+    value: false
+
 
 jobs:
 
