@@ -115,6 +115,7 @@ jobs:
       sudo apt-get install -y jack
       sudo apt-get install -y libjack-dev
       sudo apt-get install -y lv2-dev
+      sudo apt-get install -y ninja-build
       sudo apt-get install -y libfreetype6-dev
       sudo apt-get install -y libxinerama-dev
       sudo apt-get install -y libxcb-xinerama0
@@ -149,7 +150,7 @@ jobs:
       set -e
       cd surge
       
-      cmake -Bbuild -D AZURE_PIPELINE=1 -DCMAKE_INSTALL_PREFIX=/usr
+      cmake -GNinja -Bbuild -D AZURE_PIPELINE=1 -DCMAKE_INSTALL_PREFIX=/usr
       cmake --build build --config Release --target surge-xt_VST3 --parallel 2
       ./scripts/installer_linux/build-lv2 ${PWD}/build ${PWD}/ignore/lv2
       ls -al build/surge_xt_products
