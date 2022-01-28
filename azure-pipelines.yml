@@ -402,6 +402,13 @@ jobs:
       else
         echo $(date "+%Y-%m-%d %H:%M:%S %Z") > _includes/stable_xt_build_time
         echo $SURGE_VERSION > _includes/stable_xt_version
+        echo https://github.com/surge-synthesizer/releases-xt/releases/download/$SURGE_LOCAL_BRANCH/surge-xt-macOS-$SURGE_VERSION.dmg > _includes/stable_xt_macos_url
+        echo https://github.com/surge-synthesizer/releases-xt/releases/download/$SURGE_LOCAL_BRANCH/surge-xt-win64-$SURGE_VERSION-setup.exe > _includes/stable_xt_win_x64_url
+        echo https://github.com/surge-synthesizer/releases-xt/releases/download/$SURGE_LOCAL_BRANCH/surge-xt-win64-$SURGE_VERSION-pluginsonly.zip > _includes/stable_xt_win_x64_zip_url
+        echo https://github.com/surge-synthesizer/releases-xt/releases/download/$SURGE_LOCAL_BRANCH/surge-xt-win32-$SURGE_VERSION-setup-x86.exe > _includes/stable_xt_win_x86_url
+        echo https://github.com/surge-synthesizer/releases-xt/releases/download/$SURGE_LOCAL_BRANCH/surge-xt-win32-$SURGE_VERSION-pluginsonly.zip > _includes/stable_xt_win_x86_zip_url
+        echo https://github.com/surge-synthesizer/releases-xt/releases/download/$SURGE_LOCAL_BRANCH/surge-xt-linux-x64-$SURGE_VERSION.deb > _includes/stable_xt_linux_x64_url
+        echo https://github.com/surge-synthesizer/releases-xt/releases/tag/$SURGE_LOCAL_BRANCH > _includes/stable_xt_other.url
       fi
 
       git diff
