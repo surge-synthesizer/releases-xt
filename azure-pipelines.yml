@@ -15,7 +15,7 @@ jobs:
   strategy:
     matrix:
       mac:
-        imageName: 'macos-10.15'
+        imageName: 'macos-latest'
         isMac: true
       windows:
         imageName: 'windows-2019'
@@ -164,8 +164,6 @@ jobs:
 
   - bash: |
       set -e
-      sudo xcode-select -s /Applications/Xcode_12.2.app
-
       cd surge
       cmake -Bbuild -D AZURE_PIPELINE=1 -D"CMAKE_OSX_ARCHITECTURES=arm64;x86_64"
       cmake --build build --config Release --target surge-xt-distribution --parallel
