@@ -26,7 +26,7 @@ jobs:
         isWindows: true
         x86: true
       linux:
-        imageName: 'ubuntu-18.04'
+        imageName: 'ubuntu-20.04'
         isLinux: true
         
   pool:
