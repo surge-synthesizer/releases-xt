@@ -153,7 +153,7 @@ jobs:
       
       cmake -GNinja -Bbuild -D AZURE_PIPELINE=1 -DCMAKE_INSTALL_PREFIX=/usr
       cmake --build build --config Release --target surge-xt_VST3 --parallel 2
-      # ./scripts/installer_linux/build-lv2 ${PWD}/build ${PWD}/ignore/lv2
+      ./scripts/installer_linux/build-lv2 ${PWD}/build ${PWD}/ignore/lv2
       ls -al build/surge_xt_products
       cmake --build build --config Release --target surge-xt-distribution --parallel 2
       
