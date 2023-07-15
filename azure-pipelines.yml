@@ -19,7 +19,7 @@ jobs:
         imageName: 'macos-latest'
         isMac: true
       windows:
-        imageName: 'windows-2019'
+        imageName: 'windows-2022'
         isWindows: true
         x64: true
       windows-x86:
@@ -184,7 +184,7 @@ jobs:
 
       cd surge
       mkdir -p build
-      cmake -Bbuild -A x64 -D AZURE_PIPELINE=1
+      cmake -Bbuild -GNinja -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=Release -D AZURE_PIPELINE=1
     condition: and(variables.isWindows, variables.x64)
     displayName: win64 - Setup Project
 
