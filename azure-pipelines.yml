@@ -23,7 +23,7 @@ jobs:
         isWindows: true
         x64: true
       windows-x86:
-        imageName: 'windows-2019'
+        imageName: 'windows-2022'
         isWindows: true
         x86: true
       linux:
