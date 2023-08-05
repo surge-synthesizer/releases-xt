@@ -27,7 +27,7 @@ jobs:
         isWindows: true
         x86: true
       linux:
-        imageName: 'ubuntu-20.04'
+        imageName: 'ubuntu-22.04'
         isLinux: true
         
   pool:
@@ -151,7 +151,7 @@ jobs:
       set -e
       cd surge
       
-      cmake -GNinja -Bbuild -D AZURE_PIPELINE=1 -DCMAKE_INSTALL_PREFIX=/usr
+      cmake -GNinja -Bbuild -D AZURE_PIPELINE=1 -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_CXX_COMPILER=g++-12 -DCMAKE_C_COMPILER=gcc-12"
       cmake --build build --config Release --target surge-xt_VST3 --parallel 2
       # ./scripts/installer_linux/build-lv2 ${PWD}/build ${PWD}/ignore/lv2
       ls -al build/surge_xt_products
