@@ -184,7 +184,8 @@ jobs:
 
       cd surge
       mkdir -p build
-      cmake -Bbuild -GNinja -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=Release -D AZURE_PIPELINE=1
+      cmake -Bbuild -A x64 -DCMAKE_BUILD_TYPE=Release -D AZURE_PIPELINE=1
+      #cmake -Bbuild -GNinja -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=Release -D AZURE_PIPELINE=1
     condition: and(variables.isWindows, variables.x64)
     displayName: win64 - Setup Project
 
@@ -193,7 +194,7 @@ jobs:
 
       cd surge
       mkdir -p build
-      cmake -Bbuild -A Win32 -D AZURE_PIPELINE=1
+      cmake -Bbuild -A Win32 -D AZURE_PIPELINE=1 -DCMAKE_BUILD_TYPE=Release
     condition: and(variables.isWindows, variables.x86)
     displayName: win32 - Setup Project
 
