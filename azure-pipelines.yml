@@ -396,29 +396,29 @@ jobs:
       pushd surge-synthesizer.github.io
 
       if [ "$SURGE_LOCAL_BRANCH" == "main" ]; then
-        echo $(date "+%Y-%m-%d %H:%M:%S %Z") > _includes/latest_xt_build_time
-        echo $SURGE_VERSION > _includes/latest_xt_version
-        cp ../git_info/* _includes
-        echo https://github.com/surge-synthesizer/releases-xt/releases/download/Nightly/surge-xt-macOS-$SURGE_VERSION.dmg > _includes/latest_xt_macos_url
-        echo https://github.com/surge-synthesizer/releases-xt/releases/download/Nightly/surge-xt-win64-$SURGE_VERSION-setup.exe > _includes/latest_xt_win_x64_url
-        echo https://github.com/surge-synthesizer/releases-xt/releases/download/Nightly/surge-xt-win64-$SURGE_VERSION-pluginsonly.zip > _includes/latest_xt_win_x64_zip_url
-        echo https://github.com/surge-synthesizer/releases-xt/releases/download/Nightly/surge-xt-win32-$SURGE_VERSION-setup.exe > _includes/latest_xt_win_x86_url
-        echo https://github.com/surge-synthesizer/releases-xt/releases/download/Nightly/surge-xt-win32-$SURGE_VERSION-pluginsonly.zip > _includes/latest_xt_win_x86_zip_url
-        echo https://github.com/surge-synthesizer/releases-xt/releases/download/Nightly/surge-xt-linux-x64-$SURGE_VERSION.deb > _includes/latest_xt_linux_x64_url
+        echo $(date "+%Y-%m-%d %H:%M:%S %Z") > src/assets/includes/latest_xt_build_time
+        echo $SURGE_VERSION > src/assets/includes/latest_xt_version
+        cp ../git_info/* src/assets/includes
+        echo https://github.com/surge-synthesizer/releases-xt/releases/download/Nightly/surge-xt-macOS-$SURGE_VERSION.dmg > src/assets/includes/latest_xt_macos_url
+        echo https://github.com/surge-synthesizer/releases-xt/releases/download/Nightly/surge-xt-win64-$SURGE_VERSION-setup.exe > src/assets/includes/latest_xt_win_x64_url
+        echo https://github.com/surge-synthesizer/releases-xt/releases/download/Nightly/surge-xt-win64-$SURGE_VERSION-pluginsonly.zip > src/assets/includes/latest_xt_win_x64_zip_url
+        echo https://github.com/surge-synthesizer/releases-xt/releases/download/Nightly/surge-xt-win32-$SURGE_VERSION-setup.exe > src/assets/includes/latest_xt_win_x86_url
+        echo https://github.com/surge-synthesizer/releases-xt/releases/download/Nightly/surge-xt-win32-$SURGE_VERSION-pluginsonly.zip > src/assets/includes/latest_xt_win_x86_zip_url
+        echo https://github.com/surge-synthesizer/releases-xt/releases/download/Nightly/surge-xt-linux-x64-$SURGE_VERSION.deb > src/assets/includes/latest_xt_linux_x64_url
       else
-        echo $(date "+%Y-%m-%d %H:%M:%S %Z") > _includes/stable_xt_build_time
-        echo $SURGE_VERSION > _includes/stable_xt_version
-        echo https://github.com/surge-synthesizer/releases-xt/releases/download/$SURGE_VERSION/surge-xt-macOS-$SURGE_VERSION.dmg > _includes/stable_xt_macos_url
-        echo https://github.com/surge-synthesizer/releases-xt/releases/download/$SURGE_VERSION/surge-xt-win64-$SURGE_VERSION-setup.exe > _includes/stable_xt_win_x64_url
-        echo https://github.com/surge-synthesizer/releases-xt/releases/download/$SURGE_VERSION/surge-xt-win64-$SURGE_VERSION-pluginsonly.zip > _includes/stable_xt_win_x64_zip_url
-        echo https://github.com/surge-synthesizer/releases-xt/releases/download/$SURGE_VERSION/surge-xt-win32-$SURGE_VERSION-setup.exe > _includes/stable_xt_win_x86_url
-        echo https://github.com/surge-synthesizer/releases-xt/releases/download/$SURGE_VERSION/surge-xt-win32-$SURGE_VERSION-pluginsonly.zip > _includes/stable_xt_win_x86_zip_url
-        echo https://github.com/surge-synthesizer/releases-xt/releases/download/$SURGE_VERSION/surge-xt-linux-x64-$SURGE_VERSION.deb > _includes/stable_xt_linux_x64_url
-        echo https://github.com/surge-synthesizer/releases-xt/releases/tag/$SURGE_VERSION > _includes/stable_xt_other.url
+        echo $(date "+%Y-%m-%d %H:%M:%S %Z") > src/assets/includes/stable_xt_build_time
+        echo $SURGE_VERSION > src/assets/includes/stable_xt_version
+        echo https://github.com/surge-synthesizer/releases-xt/releases/download/$SURGE_VERSION/surge-xt-macOS-$SURGE_VERSION.dmg > src/assets/includes/stable_xt_macos_url
+        echo https://github.com/surge-synthesizer/releases-xt/releases/download/$SURGE_VERSION/surge-xt-win64-$SURGE_VERSION-setup.exe > src/assets/includes/stable_xt_win_x64_url
+        echo https://github.com/surge-synthesizer/releases-xt/releases/download/$SURGE_VERSION/surge-xt-win64-$SURGE_VERSION-pluginsonly.zip > src/assets/includes/stable_xt_win_x64_zip_url
+        echo https://github.com/surge-synthesizer/releases-xt/releases/download/$SURGE_VERSION/surge-xt-win32-$SURGE_VERSION-setup.exe > src/assets/includes/stable_xt_win_x86_url
+        echo https://github.com/surge-synthesizer/releases-xt/releases/download/$SURGE_VERSION/surge-xt-win32-$SURGE_VERSION-pluginsonly.zip > src/assets/includes/stable_xt_win_x86_zip_url
+        echo https://github.com/surge-synthesizer/releases-xt/releases/download/$SURGE_VERSION/surge-xt-linux-x64-$SURGE_VERSION.deb > src/assets/includes/stable_xt_linux_x64_url
+        echo https://github.com/surge-synthesizer/releases-xt/releases/tag/$SURGE_VERSION > src/assets/includes/stable_xt_other.url
       fi
 
       git diff
-      git add _includes
+      git add src/assets/includes
       git commit -m "Update releases for $SURGE_VERSION"
       git push
     displayName: Update Website
