@@ -111,10 +111,10 @@ jobs:
       export VUID=$(id -u)
       export VGID=$(id -g)
 
-      docker pull baconpaul/sst-dockerimages-ubuntu18:2
+      docker pull baconpaul/sst-dockerimages-ubuntu18:3
       docker create --user $VUID:$VGID --name surge-build-u18 --interactive --tty \
               --env SURGE_VERSION=${SURGE_VERSION} \
-              --volume=`pwd`:/home/build/surge baconpaul/sst-dockerimages-ubuntu18:2
+              --volume=`pwd`:/home/build/surge baconpaul/sst-dockerimages-ubuntu18:3
       docker start surge-build-u18
 
       docker exec surge-build-u18 bash -c "(cd /home/build/surge && ./scripts/docker-build/build.sh build --target surge-xt-distribution --parallel 6)"
