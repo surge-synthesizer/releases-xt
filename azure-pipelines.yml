@@ -107,18 +107,21 @@ jobs:
       set -e
       set -x
       cd surge
+      cmake -Bbuild -DAZURE_PIPELINE=1 -DCMAKE_BUILD_TYPE=Release
+      cmake --build build --config Release --target surge-xt-distribution --parallel
+
       
-      export VUID=$(id -u)
-      export VGID=$(id -g)
+      #export VUID=$(id -u)
+      #export VGID=$(id -g)
 
-      docker pull baconpaul/sst-dockerimages-ubuntu18:3
-      docker create --user $VUID:$VGID --name surge-build-u18 --interactive --tty \
-              --env SURGE_VERSION=${SURGE_VERSION} \
-              --volume=`pwd`:/home/build/surge baconpaul/sst-dockerimages-ubuntu18:3
-      docker start surge-build-u18
+      #docker pull baconpaul/sst-dockerimages-ubuntu18:3
+      #docker create --user $VUID:$VGID --name surge-build-u18 --interactive --tty \
+      #        --env SURGE_VERSION=${SURGE_VERSION} \
+      #        --volume=`pwd`:/home/build/surge baconpaul/sst-dockerimages-ubuntu18:3
+      #docker start surge-build-u18
 
-      docker exec surge-build-u18 bash -c "(cd /home/build/surge && ./scripts/docker-build/build.sh build --target surge-xt-distribution --parallel 6)"
-      docker stop surge-build-u18
+      #docker exec surge-build-u18 bash -c "(cd /home/build/surge && ./scripts/docker-build/build.sh build --target surge-xt-distribution --parallel 6)"
+      #docker stop surge-build-u18
 
     condition: variables.isLinux
     displayName: linux - Build Surge
@@ -127,7 +130,7 @@ jobs:
   - bash: |
       set -e
       cd surge
-      cmake -Bbuild -D AZURE_PIPELINE=1 -D"CMAKE_OSX_ARCHITECTURES=arm64;x86_64"
+      cmake -Bbuild -D AZURE_PIPELINE=1 -D"CMAKE_OSX_ARCHITECTURES=arm64;x86_64" -DCMAKE_BUILD_TYPE=Release
       cmake --build build --config Release --target surge-xt-distribution --parallel
 
     displayName: macOS - Build Surge
