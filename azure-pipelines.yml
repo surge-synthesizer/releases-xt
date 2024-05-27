@@ -1,5 +1,5 @@
 # SurgeXT synth build script
-# Bump: May 8 before 1.3.2
+# Bump for C++20 by reverting docker stuff
 
 trigger: none
 
@@ -26,7 +26,7 @@ jobs:
         isWindows: true
         x86: true
       linux:
-        imageName: 'ubuntu-latest'
+        imageName: 'ubuntu-22.04'
         isLinux: true
         
   pool:
@@ -88,6 +88,49 @@ jobs:
     name: surge
     displayName: all - Setup Source and Version
 
+  - bash: |
+      set -x
+      sudo apt-get update
+
+      # Requirements for Surge
+      
+      sudo apt-get install -y libgtkmm-3.0-dev
+      sudo apt-get install -y xcb
+      sudo apt-get install -y libxcb-util-dev
+      sudo apt-get install -y libxcb-cursor-dev
+      sudo apt-get install -y libxcb-keysyms1-dev
+      sudo apt-get install -y libxkbcommon-dev
+      sudo apt-get install -y libxkbcommon-x11-dev
+      sudo apt-get install -y devscripts
+      sudo apt-get install -y rpm
+
+      # Requirements for surge-fx
+      sudo apt-get install -y libgtk-3-dev
+      sudo apt-get install -y libwebkit2gtk-4.0
+      sudo apt-get install -y libwebkit2gtk-4.0-dev
+      sudo apt-get install -y libcurl4-openssl-dev
+      sudo apt-get install -y alsa
+      sudp apt-get install -y alsa-tools
+      sudo apt-get install -y libasound2-dev
+      sudo apt-get install -y jack
+      sudo apt-get install -y libjack-dev
+      sudo apt-get install -y lv2-dev
+      sudo apt-get install -y ninja-build
+      sudo apt-get install -y libfreetype6-dev
+      sudo apt-get install -y libxinerama-dev
+      sudo apt-get install -y libxcb-xinerama0
+      sudo apt-get install -y libxinerama1
+      sudo apt-get install -y x11proto-xinerama-dev
+      sudo apt-get install -y libxrandr-dev
+      sudo apt-get install -y libgl1-mesa-dev
+      sudo apt-get install -y libxcursor-dev 
+      sudo apt-get install -y libxcursor1 
+      sudo apt-get install -y libxcb-cursor-dev 
+      sudo apt-get install -y libxcb-cursor0
+
+    condition: variables.isLinux
+    displayName: linux - Setup Host
+
 ### Do the dummy sign (macos only)
   - task: InstallAppleCertificate@2
     inputs:
@@ -105,23 +148,15 @@ jobs:
 
   - bash: |
       set -e
-      set -x
       cd surge
-      cmake -Bbuild -DAZURE_PIPELINE=1 -DCMAKE_BUILD_TYPE=Release
-      cmake --build build --config Release --target surge-xt-distribution --parallel
-
       
-      #export VUID=$(id -u)
-      #export VGID=$(id -g)
-
-      #docker pull baconpaul/sst-dockerimages-ubuntu18:3
-      #docker create --user $VUID:$VGID --name surge-build-u18 --interactive --tty \
-      #        --env SURGE_VERSION=${SURGE_VERSION} \
-      #        --volume=`pwd`:/home/build/surge baconpaul/sst-dockerimages-ubuntu18:3
-      #docker start surge-build-u18
-
-      #docker exec surge-build-u18 bash -c "(cd /home/build/surge && ./scripts/docker-build/build.sh build --target surge-xt-distribution --parallel 6)"
-      #docker stop surge-build-u18
+      cmake -GNinja -Bbuild -D AZURE_PIPELINE=1 -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_CXX_COMPILER=g++-12 -DCMAKE_C_COMPILER=gcc-12
+      cmake --build build --config Release --target surge-xt_VST3 --parallel 2
+      # ./scripts/installer_linux/build-lv2 ${PWD}/build ${PWD}/ignore/lv2
+      ls -al build/surge_xt_products
+      cmake --build build --config Release --target surge-xt-distribution --parallel 2
+      
+      # cmake --build build --config Release --target surge-xt-rpm --parallel 2
 
     condition: variables.isLinux
     displayName: linux - Build Surge
