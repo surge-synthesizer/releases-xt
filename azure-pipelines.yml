@@ -312,6 +312,8 @@ jobs:
       cat releases/ReleaseNotes.md
       echo "---------------"
 
+      md5sum releases/*.* > releases/md5sum.txt
+
       ls -alFh releases
     displayName: Prepare Release
 
